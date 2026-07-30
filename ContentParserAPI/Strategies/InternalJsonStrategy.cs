@@ -8,35 +8,33 @@ public class InternalJsonStrategy : IContentParser
 {
     public Task<ParseResponse> ParseData(string data)
     {
+        var defaultResponse = new ParseResponse
+        {
+            Status = false,
+            ProcessedCount = 0,
+            Data = []
+        };
+
         try
         {
             var deserializedData = JsonSerializer.Deserialize<IEnumerable<Dictionary<string, object>>>(data); // TODO refactor to use stream and async
 
-            if (deserializedData is not null)
+            if (deserializedData is null)
             {
-                return Task.FromResult(new ParseResponse
-                {
-                    Status = true,
-                    ProcessedCount = deserializedData.Count(),
-                    Data = deserializedData
-                });
+                return Task.FromResult(defaultResponse);
             }
 
             return Task.FromResult(new ParseResponse
             {
-                Status = false,
-                ProcessedCount = 0,
-                Data = []
+                Status = true,
+                ProcessedCount = deserializedData.Count(),
+                Data = deserializedData
             });
+
         }
         catch (Exception)
         {
-            return Task.FromResult(new ParseResponse
-            {
-                Status = false,
-                ProcessedCount = 0,
-                Data = []
-            });
+            return Task.FromResult(defaultResponse);
         }
     }
 }

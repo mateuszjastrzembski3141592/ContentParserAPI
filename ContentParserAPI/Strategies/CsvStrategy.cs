@@ -9,13 +9,6 @@ public class CsvStrategy : IContentParser
 {
     public Task<ParseResponse> ParseData(string data)
     {
-        var defaultResponse = new ParseResponse
-        {
-            Status = false,
-            ProcessedCount = 0,
-            Data = []
-        };
-
         try
         {
             using StringReader sr = new(data);
@@ -27,7 +20,7 @@ public class CsvStrategy : IContentParser
 
             if (parsedData.Count == 0)
             {
-                return Task.FromResult(defaultResponse);
+                return Task.FromResult(ParseResponse.DefaultResponse);
             }
 
             return Task.FromResult(new ParseResponse
@@ -39,7 +32,7 @@ public class CsvStrategy : IContentParser
         }
         catch (Exception)
         {
-            return Task.FromResult(defaultResponse);
+            return Task.FromResult(ParseResponse.DefaultResponse);
         }
     }
 }

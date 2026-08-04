@@ -11,9 +11,11 @@ public class ContentProcessor(IServiceProvider service) : IContentProcessor
 
     public async Task<ParseResponse?> ProcessContentAsync(ParseRequest requestContent)
     {
-        if (!Enum.IsDefined(requestContent.Type))
+        var type = ParsePayloadType(requestContent.Type);
+
+        if (type is null)
         {
-            return ParseResponse.DefaultResponse;
+            return null;
         }
 
         var decodedContent = DecodeContent(requestContent.Content);
@@ -23,7 +25,7 @@ public class ContentProcessor(IServiceProvider service) : IContentProcessor
             return ParseResponse.DefaultResponse;
         }
 
-        IContentParser? parser = _service.GetKeyedService<IContentParser>(requestContent.Type);
+        IContentParser? parser = _service.GetKeyedService<IContentParser>(type);
 
         if (parser is null)
         {
@@ -33,6 +35,13 @@ public class ContentProcessor(IServiceProvider service) : IContentProcessor
         return await parser.ParseData(decodedContent);
     }
 
+    private static PayloadType? ParsePayloadType(string payloadType) => payloadType.ToUpperInvariant() switch
+    {
+        "CSV" => PayloadType.Csv,
+        "INTERNAL_JSON" => PayloadType.InternalJson,
+        _ => null
+    };
+
     private static string? DecodeContent(string content)
     {
         if (content is null)
@@ -40,18 +49,14 @@ public class ContentProcessor(IServiceProvider service) : IContentProcessor
             return null;
         }
 
-        try
+        byte[] data = new byte[content.Length / 4 * 3];
+
+        if (Convert.TryFromBase64String(content, data, out int bytesWritten))
         {
-            byte[] data = Convert.FromBase64String(content);
-            string decodedData = Encoding.UTF8.GetString(data);
-        
+            string decodedData = Encoding.UTF8.GetString(data, 0, bytesWritten);
             return decodedData;
-
-        }
-        catch (Exception)
-        {
-            return null;
         }
 
+        return null;
     }
 }

@@ -1,6 +1,48 @@
 @ContentParserAPI_HostAddress = http://localhost:5287
 
-GET {{ContentParserAPI_HostAddress}}/weatherforecast/
+# Content: header1,header2\nvalue1,value2
+POST {{ContentParserAPI_HostAddress}}/api/v1/parse-content
+Content-Type: application/json
 Accept: application/json
 
+{
+  "Type": "CSV",
+  "Content": "aGVhZGVyMSxoZWFkZXIyCnZhbHVlMSx2YWx1ZTI=" 
+}
+
 ###
+
+# Content: [{"id": 1, "name": "Test"}]
+POST {{ContentParserAPI_HostAddress}}/api/v1/parse-content
+Content-Type: application/json
+Accept: application/json
+
+{
+  "Type": "INTERNAL_JSON",
+  "Content": "W3siaWQiOiAxLCAibmFtZSI6ICJUZXN0In1d"
+}
+
+###
+
+# Empty Content
+POST {{ContentParserAPI_HostAddress}}/api/v1/parse-content
+Content-Type: application/json
+Accept: application/json
+
+{
+  "Type": "CSV",
+  "Content": ""
+}
+
+###
+
+# Unsupported format
+# Content: this is a test message
+POST {{ContentParserAPI_HostAddress}}/api/v1/parse-content
+Content-Type: application/json
+Accept: application/json
+
+{
+  "Type": "TXT",
+  "Content": "dGhpcyBpcyBhIHRlc3QgbWVzc2FnZQ=="
+}

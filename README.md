@@ -26,3 +26,12 @@ This project is designed to be pulled and tested without the need for external t
 4. Locate and open the `ContentParserAPI.http` file (in the project's root directory).
 5. The `.http` file contains pre-configured `POST` requests with valid and invalid **Base64** payloads (generated via an online encoder).
 6. Click the `Send Request` or `Run` button near the test example to send a request and observe the routing process.
+
+### Upcoming Architectural Refactoring
+This project is currently undergoing an architectural review:
+
+- Elimination of the Service Locator Anti-Pattern
+- Implementation of the Result Pattern
+- Global Exception Handling (RFC 7807)
+- Single Responsibility Principle (SRP) Enforcement
+- Record Types for DTOs
